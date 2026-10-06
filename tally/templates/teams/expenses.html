@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ team.name }}</h1>
+{% include "teams/_nav.html" %}
+<table class="grid">
+  <thead><tr><th>Date</th><th>Member</th><th>Description</th><th class="num">Amount</th><th>Status</th><th></th></tr></thead>
+  <tbody>
+  {% for e in items %}
+    <tr>
+      <td>{{ e.spent_on }}</td>
+      <td>{{ e.owner.name }}</td>
+      <td><a href="{{ url_for('expenses.detail', expense_id=e.id) }}">{{ e.description }}</a></td>
+      <td class="num">{{ e.amount|money(e.currency) }}</td>
+      <td><span class="pill pill-{{ e.status }}">{{ e.status }}</span></td>
+      <td>
+        {% if current_user.is_manager and e.status == "pending" %}
+        <form method="post" action="{{ url_for('expenses.review', expense_id=e.id) }}" class="inline">
+          <input name="message" placeholder="Message (optional)">
+          <button name="decision" value="approved">Approve</button>
+          <button name="decision" value="rejected" class="danger">Reject</button>
+          <a href="{{ url_for('expenses.email_preview', expense_id=e.id) }}" target="_blank">Preview e-mail</a>
+        </form>
+        {% endif %}
+      </td>
+    </tr>
+  {% else %}
+    <tr><td colspan="6" class="muted">No expenses yet.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

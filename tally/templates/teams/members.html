@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ team.name }}</h1>
+{% include "teams/_nav.html" %}
+<form class="filters" method="get">
+  <select name="role">
+    <option value="">Everyone</option>
+    <option value="manager" {% if role == "manager" %}selected{% endif %}>Managers</option>
+    <option value="member" {% if role == "member" %}selected{% endif %}>Members</option>
+  </select>
+  <button type="submit">Show</button>
+</form>
+<ul class="people">
+{% for member in members %}
+  <li>
+    <strong>{{ member.name }}</strong> <span class="muted">{{ member.email }} · {{ member.role }}</span>
+    {% if member.website %}<a href="{{ member.website }}" rel="nofollow noopener" target="_blank">Website</a>{% endif %}
+  </li>
+{% endfor %}
+</ul>
+{% endblock %}

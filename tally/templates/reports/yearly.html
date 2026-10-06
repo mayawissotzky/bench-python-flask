@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ year }} at a glance</h1>
+{% include "reports/_nav.html" %}
+<form class="filters" method="get">
+  <input type="number" name="year" value="{{ year }}" min="2000" max="2100">
+  <button type="submit">Show</button>
+</form>
+<table class="grid">
+  <thead><tr><th>Month</th><th class="num">Expenses</th><th class="num">Total</th></tr></thead>
+  <tbody>
+  {% for row in rows %}<tr><td>{{ row.month }}</td><td class="num">{{ row.count }}</td><td class="num">{{ row.total|money }}</td></tr>
+  {% else %}<tr><td colspan="3" class="muted">No expenses in {{ year }}.</td></tr>{% endfor %}
+  </tbody>
+</table>
+{% endblock %}

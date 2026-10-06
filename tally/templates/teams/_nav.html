@@ -1,0 +1,5 @@
+<nav class="tabs">
+  <a href="{{ url_for('teams.expenses', team_id=team.id) }}">Expenses</a>
+  <a href="{{ url_for('teams.members', team_id=team.id) }}">Members</a>
+  {% if current_user.is_manager %}<a href="{{ url_for('teams.settings', team_id=team.id) }}">Settings</a>{% endif %}
+</nav>

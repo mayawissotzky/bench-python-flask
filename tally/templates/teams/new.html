@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="card narrow">
+  <h1>Create a team</h1>
+  <p class="muted">You will be the team's manager and can approve expenses.</p>
+  <form method="post">
+    <label>Team name <input name="name" required maxlength="120"></label>
+    <label>Description <textarea name="description" rows="3"></textarea></label>
+    <button type="submit">Create team</button>
+  </form>
+</section>
+{% endblock %}

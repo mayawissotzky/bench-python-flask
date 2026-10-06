@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Approved spend by category</h1>
+{% include "reports/_nav.html" %}
+<table class="grid">
+  <thead><tr>
+    <th><a href="?sort=category">Category</a></th>
+    <th class="num"><a href="?sort=count">Expenses</a></th>
+    <th class="num"><a href="?sort=total">Total</a></th>
+  </tr></thead>
+  <tbody>
+  {% for row in rows %}<tr><td>{{ row.category|title }}</td><td class="num">{{ row.expense_count }}</td><td class="num">{{ row.total|money }}</td></tr>
+  {% else %}<tr><td colspan="3" class="muted">No approved expenses yet.</td></tr>{% endfor %}
+  </tbody>
+</table>
+{% endblock %}

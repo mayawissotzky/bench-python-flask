@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Search expenses</h1>
+<form class="filters" method="get">
+  <input name="q" value="{{ q }}" placeholder="Description contains…" autofocus>
+  <button type="submit">Search</button>
+</form>
+{% if q %}{% include "expenses/_table.html" %}{% endif %}
+{% endblock %}

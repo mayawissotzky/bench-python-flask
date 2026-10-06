@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Monthly report</h1>
+{% include "reports/_nav.html" %}
+<form class="filters" method="get">
+  <input type="month" name="month" value="{{ month }}">
+  <select name="sort">
+    <option value="category" {% if sort == "category" %}selected{% endif %}>Category</option>
+    <option value="total DESC" {% if sort == "total DESC" %}selected{% endif %}>Total</option>
+    <option value="count DESC" {% if sort == "count DESC" %}selected{% endif %}>Count</option>
+  </select>
+  <button type="submit">Show</button>
+  <a href="{{ url_for('reports.monthly_csv', month=month, sort=sort) }}">Download CSV</a>
+</form>
+<table class="grid">
+  <thead><tr><th>Category</th><th class="num">Expenses</th><th class="num">Total</th></tr></thead>
+  <tbody>
+  {% for row in rows %}<tr><td>{{ row.category|title }}</td><td class="num">{{ row.count }}</td><td class="num">{{ row.total|money }}</td></tr>
+  {% else %}<tr><td colspan="3" class="muted">Nothing recorded for {{ month }}.</td></tr>{% endfor %}
+  </tbody>
+</table>
+{% if current_user.is_manager %}
+<form method="post" action="{{ url_for('reports.publish_monthly') }}">
+  <input type="hidden" name="month" value="{{ month }}">
+  <button type="submit">Send to finance</button>
+</form>
+{% endif %}
+{% endblock %}

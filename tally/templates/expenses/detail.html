@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="card">
+  <h1>{{ expense.description }}</h1>
+  <dl class="facts">
+    <dt>Amount</dt><dd>{{ expense.amount|money(expense.currency) }}</dd>
+    <dt>Category</dt><dd>{{ expense.category|title }}</dd>
+    <dt>Date</dt><dd>{{ expense.spent_on }}</dd>
+    <dt>Submitted by</dt><dd>{{ expense.owner.name }}</dd>
+    <dt>Status</dt><dd><span class="pill pill-{{ expense.status }}">{{ expense.status }}</span></dd>
+  </dl>
+
+  <h2>Receipt notes</h2>
+  <div class="notes">{{ expense.notes|safe }}</div>
+
+  {% if expense.owner_id == current_user.id %}
+  <form method="post" action="{{ url_for('expenses.add_note', expense_id=expense.id) }}">
+    <textarea name="note" rows="2" placeholder="Add a note (e.g. receipt #, who attended)"></textarea>
+    <button type="submit">Add note</button>
+  </form>
+  {% endif %}
+</section>
+
+<section class="card">
+  <h2>Edit</h2>
+  <form method="post" action="{{ url_for('expenses.edit', expense_id=expense.id) }}">
+    <label>Description <input name="description" value="{{ expense.description }}"></label>
+    <label>Category
+      <select name="category">{% for c in categories %}<option value="{{ c }}" {% if c == expense.category %}selected{% endif %}>{{ c|title }}</option>{% endfor %}</select>
+    </label>
+    <label>Amount <input name="amount" value="{{ expense.amount }}"></label>
+    <label>Date <input type="date" name="spent_on" value="{{ expense.spent_on }}"></label>
+    <button type="submit">Save changes</button>
+  </form>
+  {% if expense.owner_id == current_user.id %}
+  <form method="post" action="{{ url_for('expenses.delete', expense_id=expense.id) }}">
+    <button class="danger" type="submit">Delete expense</button>
+  </form>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="card">
+  <h1>Add expense</h1>
+  <form method="post">
+    <label>Description <input name="description" required maxlength="255"></label>
+    <label>Category
+      <select name="category">{% for c in categories %}<option value="{{ c }}">{{ c|title }}</option>{% endfor %}</select>
+    </label>
+    <label>Amount <input name="amount" inputmode="decimal" required></label>
+    <label>Currency <input name="currency" value="USD" maxlength="3"></label>
+    <label>Date <input type="date" name="spent_on"></label>
+    <label>Receipt notes <textarea name="notes" rows="4"></textarea></label>
+    <button type="submit">Save</button>
+  </form>
+</section>
+{% endblock %}

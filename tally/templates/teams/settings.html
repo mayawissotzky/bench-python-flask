@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ team.name }}</h1>
+{% include "teams/_nav.html" %}
+<section class="card">
+  <form method="post">
+    <label>Team name <input name="name" value="{{ team.name }}" maxlength="120"></label>
+    <label>Description <textarea name="description" rows="3">{{ team.description }}</textarea></label>
+    <button type="submit">Save</button>
+  </form>
+</section>
+{% endblock %}

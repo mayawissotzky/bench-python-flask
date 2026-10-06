@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="toolbar">
+  <h1>My expenses</h1>
+  <a class="button" href="{{ url_for('expenses.create') }}">Add expense</a>
+</div>
+<form class="filters" method="get">
+  <select name="category">
+    <option value="">All categories</option>
+    {% for c in categories %}<option value="{{ c }}" {% if filters.get('category') == c %}selected{% endif %}>{{ c|title }}</option>{% endfor %}
+  </select>
+  <select name="status">
+    <option value="">Any status</option>
+    {% for s in ["pending", "approved", "rejected"] %}<option {% if filters.get('status') == s %}selected{% endif %}>{{ s }}</option>{% endfor %}
+  </select>
+  <input type="date" name="from" value="{{ filters.get('from', '') }}">
+  <input type="date" name="to" value="{{ filters.get('to', '') }}">
+  <button type="submit">Filter</button>
+  <a href="{{ url_for('expenses.search') }}">Search</a>
+</form>
+{% include "expenses/_table.html" %}
+{% endblock %}

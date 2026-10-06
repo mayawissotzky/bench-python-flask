@@ -1,0 +1,32 @@
+:root { --fg: #1d2330; --muted: #6b7280; --line: #e5e7eb; --accent: #2563eb; }
+* { box-sizing: border-box; }
+body { margin: 0; font: 15px/1.5 system-ui, sans-serif; color: var(--fg); background: #f8fafc; }
+.topbar { display: flex; gap: 1.5rem; align-items: center; padding: .75rem 1.5rem; background: #fff; border-bottom: 1px solid var(--line); }
+.topbar nav { display: flex; gap: 1rem; flex: 1; }
+.brand { font-weight: 700; text-decoration: none; color: var(--accent); }
+.who { display: flex; gap: .75rem; align-items: center; }
+main { max-width: 960px; margin: 2rem auto; padding: 0 1rem; }
+.card { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 1.25rem; margin-bottom: 1rem; }
+.narrow { max-width: 420px; margin: 0 auto; }
+label { display: block; margin-bottom: .75rem; }
+label.inline { display: flex; gap: .5rem; }
+input, select, textarea { width: 100%; padding: .4rem .5rem; border: 1px solid var(--line); border-radius: 4px; font: inherit; }
+.filters input, .filters select { width: auto; }
+.filters, .toolbar { display: flex; gap: .5rem; align-items: center; margin-bottom: 1rem; }
+.toolbar { justify-content: space-between; }
+.grid { width: 100%; border-collapse: collapse; background: #fff; }
+.grid th, .grid td { padding: .5rem; border-bottom: 1px solid var(--line); text-align: left; }
+.num { text-align: right !important; }
+.muted { color: var(--muted); }
+.pill { padding: .1rem .5rem; border-radius: 999px; font-size: .8rem; background: #eef2ff; }
+.pill-approved { background: #dcfce7; } .pill-rejected { background: #fee2e2; }
+.team-badge { background: #eff6ff; color: var(--accent); padding: .1rem .5rem; border-radius: 4px; font-size: .8rem; }
+.flash { padding: .5rem .75rem; border-radius: 4px; margin-bottom: 1rem; background: #eef2ff; }
+.flash-error { background: #fee2e2; }
+.tabs { display: flex; gap: 1rem; margin-bottom: 1rem; }
+.facts { display: grid; grid-template-columns: 9rem 1fr; gap: .25rem 1rem; }
+.notes { white-space: pre-line; }
+button, .button { background: var(--accent); color: #fff; border: 0; border-radius: 4px; padding: .45rem .9rem; cursor: pointer; text-decoration: none; }
+button.link { background: none; color: var(--accent); padding: 0; }
+button.danger { background: #dc2626; }
+form.inline { display: flex; gap: .25rem; align-items: center; }

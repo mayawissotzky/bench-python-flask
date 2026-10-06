@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="card">
+  <h1>Your profile</h1>
+  <form method="post">
+    <label>Display name <input name="name" value="{{ user.name }}" maxlength="120"></label>
+    <label>Website <input name="website" value="{{ user.website }}" placeholder="https://…"></label>
+    <label>Bio <textarea name="bio" rows="4">{{ user.bio }}</textarea></label>
+    <button type="submit">Save</button>
+  </form>
+</section>
+<section class="card">
+  <h2>Preview</h2>
+  <div class="bio">{{ bio_html|safe }}</div>
+</section>
+{% endblock %}
