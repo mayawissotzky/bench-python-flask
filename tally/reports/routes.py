@@ -2,11 +2,11 @@ import csv
 import io
 from datetime import date
 
-from flask import Blueprint, Response, abort, flash, redirect, render_template, request, url_for
+from flask import Blueprint, Response, abort, flash, jsonify, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
 from ..services import reporting_client
-from . import queries
+from . import queries, vendors
 
 bp = Blueprint("reports", __name__, url_prefix="/reports")
 
@@ -80,3 +80,9 @@ def yearly():
         abort(400, "Year must be a number")
     rows = queries.yearly_totals(current_user.team_id, year)
     return render_template("reports/yearly.html", rows=rows, year=year)
+
+
+@bp.get("/vendors")
+def vendor_report():
+    rows = vendors.vendor_totals(current_user.team_id, request.args.get("vendor", ""))
+    return jsonify([dict(r) for r in rows])
