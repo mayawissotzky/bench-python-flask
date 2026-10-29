@@ -10,7 +10,7 @@ def create_app(config_object="tally.config.Config"):
     db.init_app(app)
     login_manager.init_app(app)
 
-    from . import api, auth, expenses, profile
+    from . import api, auth, expenses, profile, receipts
     from .cli import register_commands
     from .reports.routes import bp as reports_bp
     from .services.formatting import format_amount, team_badge
@@ -22,6 +22,7 @@ def create_app(config_object="tally.config.Config"):
     app.register_blueprint(reports_bp)
     app.register_blueprint(profile.bp)
     app.register_blueprint(api.bp)
+    app.register_blueprint(receipts.bp)
 
     app.jinja_env.globals["team_badge"] = team_badge
     app.jinja_env.filters["money"] = format_amount
