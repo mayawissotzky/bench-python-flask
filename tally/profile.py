@@ -21,5 +21,6 @@ def edit():
 @bp.get("/preview")
 @login_required
 def preview():
+    """Render the bio as it will appear on the profile page."""
     bio = request.args.get("bio", "")
     return f"<div class='bio-preview'>{bio}</div>"
