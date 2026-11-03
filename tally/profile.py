@@ -16,3 +16,10 @@ def edit():
         return redirect(url_for("profile.edit"))
     bio_html = nh3.clean(current_user.bio or "")
     return render_template("profile/edit.html", user=current_user, bio_html=bio_html)
+
+
+@bp.get("/preview")
+@login_required
+def preview():
+    bio = request.args.get("bio", "")
+    return f"<div class='bio-preview'>{bio}</div>"
