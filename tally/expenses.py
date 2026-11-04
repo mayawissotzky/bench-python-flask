@@ -24,6 +24,7 @@ def index():
 @bp.get("/search")
 @login_required
 def search():
+    """Search the current team's expenses by the ``q`` query parameter."""
     q = request.args.get("q", "").strip()
     rows = []
     if q:
