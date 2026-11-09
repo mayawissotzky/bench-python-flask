@@ -2,7 +2,9 @@
 {% block content %}
 <h1>Approved spend by category</h1>
 {% include "reports/_nav.html" %}
-<table class="grid">
+<input id="category-filter" type="search" placeholder="Filter categories" value="">
+<p id="filter-status" class="muted"></p>
+<table class="grid" id="category-table">
   <thead><tr>
     <th><a href="?sort=category">Category</a></th>
     <th class="num"><a href="?sort=count">Expenses</a></th>
@@ -13,4 +15,27 @@
   {% else %}<tr><td colspan="3" class="muted">No approved expenses yet.</td></tr>{% endfor %}
   </tbody>
 </table>
+<script>
+  (function () {
+    var input = document.getElementById("category-filter");
+    var status = document.getElementById("filter-status");
+    var rows = document.querySelectorAll("#category-table tbody tr");
+
+    function apply(q) {
+      var shown = 0;
+      rows.forEach(function (row) {
+        var match = row.cells[0].textContent.toLowerCase().indexOf(q.toLowerCase()) !== -1;
+        row.hidden = !match;
+        if (match) shown++;
+      });
+      status.innerHTML = q && !shown ? "No categories match <strong>" + q + "</strong>" : "";
+      history.replaceState(null, "", q ? "#q=" + encodeURIComponent(q) : location.pathname + location.search);
+    }
+
+    input.addEventListener("input", function () { apply(input.value); });
+
+    var initial = decodeURIComponent((location.hash.match(/q=([^&]*)/) || [])[1] || "");
+    if (initial) { input.value = initial; apply(initial); }
+  })();
+</script>
 {% endblock %}
