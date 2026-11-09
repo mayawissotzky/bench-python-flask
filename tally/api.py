@@ -26,6 +26,7 @@ def list_expenses():
 @bp.get("/expenses/<int:expense_id>")
 @login_required
 def get_expense(expense_id):
+    """Return one of the current user's expenses as JSON, or 404 if it is not theirs."""
     expense = db.first_or_404(select(Expense).filter_by(id=expense_id, owner_id=current_user.id))
     return jsonify(expense.to_dict())
 
