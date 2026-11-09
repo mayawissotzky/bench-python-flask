@@ -1,3 +1,5 @@
+from decimal import Decimal, InvalidOperation
+
 from flask import Blueprint, abort, current_app, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 from sqlalchemy import select, text
@@ -13,6 +15,12 @@ bp = Blueprint("expenses", __name__, url_prefix="/expenses")
 @login_required
 def index():
     rows = expense_service.list_expenses(current_user.id, request.args)
+    try:
+        min_amount = Decimal(request.args.get("min") or 0)
+    except InvalidOperation:
+        min_amount = Decimal(0)
+    if min_amount.is_finite() and min_amount > 0:
+        rows = [r for r in rows if r["amount"] >= min_amount]
     return render_template(
         "expenses/list.html",
         rows=rows,

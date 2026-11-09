@@ -15,6 +15,7 @@
   </select>
   <input type="date" name="from" value="{{ filters.get('from', '') }}">
   <input type="date" name="to" value="{{ filters.get('to', '') }}">
+  <input type="number" name="min" step="0.01" min="0" placeholder="Min amount" value={{ filters.get('min', '') }}>
   <button type="submit">Filter</button>
   <a href="{{ url_for('expenses.search') }}">Search</a>
 </form>
