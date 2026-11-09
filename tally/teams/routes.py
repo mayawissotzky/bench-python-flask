@@ -37,6 +37,16 @@ def expenses(team_id):
     return render_template("teams/expenses.html", team=db.session.get(Team, team_id), items=items)
 
 
+@bp.get("/<int:team_id>/expenses/print")
+def print_expenses(team_id):
+    status = request.args.get("status")
+    stmt = select(Expense).where(Expense.team_id == team_id).order_by(Expense.spent_on.desc())
+    if status:
+        stmt = stmt.where(Expense.status == status)
+    items = db.session.scalars(stmt).all()
+    return render_template("teams/print.jinja", team=db.get_or_404(Team, team_id), items=items, status=status)
+
+
 @bp.get("/<int:team_id>/members")
 def members(team_id):
     role = request.args.get("role", "")
