@@ -15,6 +15,13 @@
   </select>
   <input type="date" name="from" value="{{ filters.get('from', '') }}">
   <input type="date" name="to" value="{{ filters.get('to', '') }}">
+  <select name="sort">
+    {% for value, label in [("spent_on", "Date"), ("amount", "Amount"), ("description", "Description")] %}<option value="{{ value }}" {% if filters.get('sort') == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+  </select>
+  <select name="dir">
+    <option value="desc" {% if filters.get('dir') != 'asc' %}selected{% endif %}>Newest / highest first</option>
+    <option value="asc" {% if filters.get('dir') == 'asc' %}selected{% endif %}>Oldest / lowest first</option>
+  </select>
   <button type="submit">Filter</button>
   <a href="{{ url_for('expenses.search') }}">Search</a>
 </form>
