@@ -12,3 +12,12 @@ def build_expense_filters(args):
     if args.get("to"):
         clauses.append(f"spent_on <= '{args['to']}'")
     return clauses
+
+
+SORT_DIRECTIONS = {"asc": "ASC", "desc": "DESC"}
+
+
+def build_expense_order(args):
+    column = args.get("sort") or "spent_on"
+    direction = SORT_DIRECTIONS.get((args.get("dir") or "desc").lower(), "DESC")
+    return f"{column} {direction}, id DESC"

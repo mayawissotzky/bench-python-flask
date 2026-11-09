@@ -6,14 +6,15 @@ from sqlalchemy import text
 
 from ..extensions import db
 from ..models import Expense
-from .filters import build_expense_filters
+from .filters import build_expense_filters, build_expense_order
 
 
 def list_expenses(owner_id, args):
     conditions = ["owner_id = :owner"] + build_expense_filters(args)
     sql = (
         "SELECT id, description, category, amount, currency, spent_on, status "
-        "FROM expenses WHERE " + " AND ".join(conditions) + " ORDER BY spent_on DESC, id DESC"
+        "FROM expenses WHERE " + " AND ".join(conditions)
+        + " ORDER BY " + build_expense_order(args)
     )
     return db.session.execute(text(sql), {"owner": owner_id}).mappings().all()
 
