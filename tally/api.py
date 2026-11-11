@@ -4,6 +4,7 @@ from sqlalchemy import select, text
 
 from .extensions import db
 from .models import Expense
+from .services import comment_service
 from .services.accounts import apply_profile_changes
 
 bp = Blueprint("api", __name__, url_prefix="/api")
@@ -28,6 +29,17 @@ def list_expenses():
 def get_expense(expense_id):
     expense = db.first_or_404(select(Expense).filter_by(id=expense_id, owner_id=current_user.id))
     return jsonify(expense.to_dict())
+
+
+@bp.get("/expenses/<int:expense_id>/comments")
+@login_required
+def list_comments(expense_id):
+    expense = db.first_or_404(select(Expense).filter_by(id=expense_id, owner_id=current_user.id))
+    rows = comment_service.comments_since(expense.id, request.args.get("since"))
+    return jsonify(
+        count=comment_service.comment_count(expense.id),
+        comments=[{**row, "created_at": row["created_at"].isoformat()} for row in rows],
+    )
 
 
 @bp.get("/profile")

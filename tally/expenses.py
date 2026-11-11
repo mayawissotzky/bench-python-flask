@@ -3,8 +3,8 @@ from flask_login import current_user, login_required
 from sqlalchemy import select, text
 
 from .extensions import db
-from .models import Expense
-from .services import expense_service, mailer
+from .models import Expense, ExpenseComment
+from .services import comment_service, expense_service, mailer
 
 bp = Blueprint("expenses", __name__, url_prefix="/expenses")
 
@@ -55,6 +55,7 @@ def detail(expense_id):
         "expenses/detail.html",
         expense=expense,
         categories=current_app.config["EXPENSE_CATEGORIES"],
+        comments=comment_service.comments_since(expense.id),
     )
 
 
@@ -75,6 +76,27 @@ def add_note(expense_id):
         expense.notes = f"{expense.notes}\n{note}".strip()
         db.session.commit()
     return redirect(url_for("expenses.detail", expense_id=expense.id))
+
+
+@bp.post("/<int:expense_id>/comments")
+@login_required
+def add_comment(expense_id):
+    expense = db.get_or_404(Expense, expense_id)
+    body = request.form.get("body", "").strip()
+    if body:
+        db.session.add(ExpenseComment(expense_id=expense.id, author_id=current_user.id, body=body[:2000]))
+        db.session.commit()
+    return redirect(url_for("expenses.detail", expense_id=expense.id, _anchor="comments"))
+
+
+@bp.post("/comments/<int:comment_id>/delete")
+@login_required
+def delete_comment(comment_id):
+    comment = db.first_or_404(select(ExpenseComment).filter_by(id=comment_id, author_id=current_user.id))
+    expense_id = comment.expense_id
+    db.session.delete(comment)
+    db.session.commit()
+    return redirect(url_for("expenses.detail", expense_id=expense_id, _anchor="comments"))
 
 
 @bp.post("/<int:expense_id>/delete")
