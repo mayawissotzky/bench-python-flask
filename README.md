@@ -7,7 +7,7 @@ yearly reports for their team (with a CSV export for the bookkeeper).
 ## Features
 
 - Accounts with email + password sign-in
-- Teams with a manager and members
+- Teams with a manager and members, who join through e-mail invite links
 - Expenses with categories, receipt notes and an approval workflow
 - Status e-mails to the expense owner when an expense is approved or rejected
 - Monthly / category / yearly team reports and CSV export

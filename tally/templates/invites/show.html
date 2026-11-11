@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="card">
+  <h1>Join {{ invite.team_name }}</h1>
+  <p>{{ invite.inviter }} invited {{ invite.email }} to join as a {{ invite.role }}.</p>
+  {% if invite.message %}<blockquote>{{ invite.message|safe }}</blockquote>{% endif %}
+  <form method="post" action="{{ url_for('invites.accept', token=token) }}">
+    <button type="submit">Accept invite</button>
+  </form>
+</section>
+{% endblock %}

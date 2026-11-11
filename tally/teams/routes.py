@@ -1,9 +1,11 @@
+import secrets
+
 from flask import abort, flash, redirect, render_template, request, url_for
 from flask_login import current_user
 from sqlalchemy import select
 
 from ..extensions import db
-from ..models import Expense, Team
+from ..models import Expense, Team, TeamInvite
 from . import bp
 from .directory import list_members
 
@@ -56,3 +58,45 @@ def settings(team_id):
         flash("Team updated.", "success")
         return redirect(url_for("teams.settings", team_id=team.id))
     return render_template("teams/settings.html", team=team)
+
+
+@bp.route("/<int:team_id>/invites", methods=["GET", "POST"])
+def invites(team_id):
+    team = db.get_or_404(Team, team_id)
+    if request.method == "POST":
+        email = request.form.get("email", "").strip().lower()
+        role = request.form.get("role", "member")
+        if role not in ("member", "manager"):
+            abort(400)
+        if "@" not in email:
+            flash("Enter the e-mail address to invite.", "error")
+        else:
+            invite = TeamInvite(
+                team_id=team.id,
+                email=email[:255],
+                role=role,
+                message=request.form.get("message", "")[:1000],
+                token=secrets.token_urlsafe(24),
+                invited_by_id=current_user.id,
+            )
+            db.session.add(invite)
+            db.session.commit()
+            flash(f"Invite link for {email}: {url_for('invites.show', token=invite.token, _external=True)}", "success")
+        return redirect(url_for("teams.invites", team_id=team.id))
+    pending = db.session.scalars(
+        select(TeamInvite)
+        .where(TeamInvite.team_id == team.id, TeamInvite.accepted_at.is_(None))
+        .order_by(TeamInvite.created_at.desc())
+    ).all()
+    return render_template("teams/invites.html", team=team, invites=pending)
+
+
+@bp.post("/<int:team_id>/invites/<int:invite_id>/revoke")
+def revoke_invite(team_id, invite_id):
+    if not current_user.is_manager:
+        abort(403)
+    invite = db.first_or_404(select(TeamInvite).filter_by(id=invite_id, team_id=team_id, accepted_at=None))
+    db.session.delete(invite)
+    db.session.commit()
+    flash("Invite revoked.", "success")
+    return redirect(url_for("teams.invites", team_id=team_id))

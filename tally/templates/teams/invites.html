@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ team.name }}</h1>
+{% include "teams/_nav.html" %}
+<section class="card">
+  <h2>Invite someone</h2>
+  <form method="post">
+    <label>E-mail <input type="email" name="email" required></label>
+    <label>Role
+      <select name="role"><option value="member">Member</option><option value="manager">Manager</option></select>
+    </label>
+    <label>Message <textarea name="message" rows="3" placeholder="Optional note shown on the invite page. Basic HTML like <b> and links is fine."></textarea></label>
+    <button type="submit">Create invite</button>
+  </form>
+</section>
+<section class="card">
+  <h2>Pending invites</h2>
+  <ul class="people">
+  {% for invite in invites %}
+    <li>
+      <strong>{{ invite.email }}</strong> <span class="muted">{{ invite.role }} · invited by {{ invite.invited_by.name }} on {{ invite.created_at.strftime("%Y-%m-%d") }}</span>
+      <form method="post" action="{{ url_for('teams.revoke_invite', team_id=team.id, invite_id=invite.id) }}"><button class="danger" type="submit">Revoke</button></form>
+    </li>
+  {% else %}
+    <li class="muted">No pending invites.</li>
+  {% endfor %}
+  </ul>
+</section>
+{% endblock %}
