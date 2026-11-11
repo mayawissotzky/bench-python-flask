@@ -77,6 +77,22 @@ class Expense(db.Model):
         }
 
 
+class TeamInvite(db.Model):
+    __tablename__ = "team_invites"
+
+    id = db.Column(db.Integer, primary_key=True)
+    team_id = db.Column(db.Integer, db.ForeignKey("teams.id", ondelete="CASCADE"), nullable=False, index=True)
+    email = db.Column(db.String(255), nullable=False)
+    role = db.Column(db.String(20), nullable=False, default="member")
+    message = db.Column(db.Text, nullable=False, default="")
+    token = db.Column(db.String(64), unique=True, nullable=False)
+    invited_by_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False, default=_now)
+    accepted_at = db.Column(db.DateTime(timezone=True))
+
+    invited_by = db.relationship("User")
+
+
 @login_manager.user_loader
 def load_user(user_id):
     return db.session.get(User, int(user_id))
