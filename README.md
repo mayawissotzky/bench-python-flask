@@ -9,6 +9,7 @@ yearly reports for their team (with a CSV export for the bookkeeper).
 - Accounts with email + password sign-in
 - Teams with a manager and members
 - Expenses with categories, receipt notes and an approval workflow
+- Comments on an expense, so the owner and reviewer can discuss it
 - Status e-mails to the expense owner when an expense is approved or rejected
 - Monthly / category / yearly team reports and CSV export
 - Profile page (display name, website, short bio)

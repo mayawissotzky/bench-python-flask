@@ -21,6 +21,22 @@
   {% endif %}
 </section>
 
+<section class="card" id="comments">
+  <h2>Comments</h2>
+  {% for c in comments %}
+  <article class="comment">
+    <header><strong>{{ c.author }}</strong> <span class="muted">{{ c.created_at.strftime("%Y-%m-%d %H:%M") }}</span></header>
+    <p>{{ c.body|comment }}</p>
+  </article>
+  {% else %}
+  <p class="muted">No comments yet.</p>
+  {% endfor %}
+  <form method="post" action="{{ url_for('expenses.add_comment', expense_id=expense.id) }}">
+    <textarea name="body" rows="2" placeholder="Ask a question or add context for the reviewer"></textarea>
+    <button type="submit">Comment</button>
+  </form>
+</section>
+
 <section class="card">
   <h2>Edit</h2>
   <form method="post" action="{{ url_for('expenses.edit', expense_id=expense.id) }}">
