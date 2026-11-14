@@ -12,5 +12,5 @@ def team_badge(team):
 
 
 def format_percent(value: float, digits: int = 1) -> str:
-    """Render a 0-1 ratio as a percentage string, e.g. 0.257 -> '25.7%'."""
+    """Render a 0-1 ratio as a percentage string (no clamping), e.g. 0.257 -> '25.7%'."""
     return f"{value * 100:.{digits}f}%"
