@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Tag several expenses · Tally{% endblock %}
+{% block content %}
+<h1>Tag several expenses</h1>
+{% include "tags/_nav.html" %}
+{% if not tags %}
+  <p class="muted">You have no tags yet. <a href="{{ url_for('tags.index') }}">Create one</a> first.</p>
+{% else %}
+<form method="post" action="{{ url_for('tags.bulk') }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="filters">
+    <select name="tag_id" required>
+      <option value="">Choose a tag…</option>
+      {% for tag in tags %}<option value="{{ tag.id }}">{{ tag.name }}</option>{% endfor %}
+    </select>
+    <button type="submit" name="action" value="add">Add tag to selected</button>
+    <button type="submit" name="action" value="remove" class="danger">Remove tag from selected</button>
+  </div>
+  <p class="muted">Showing your {{ page_size }} most recent expenses.</p>
+  <table class="grid">
+    <thead><tr><th></th><th>Date</th><th>Description</th><th class="num">Amount</th><th>Tags</th></tr></thead>
+    <tbody>
+    {% for e in expenses %}
+      <tr>
+        <td><input type="checkbox" name="expense_id" value="{{ e.id }}" aria-label="Select {{ e.description }}"></td>
+        <td>{{ e.spent_on }}</td>
+        <td><a href="{{ url_for('tags.expense_tags', expense_id=e.id) }}">{{ e.description }}</a></td>
+        <td class="num">{{ "{:,.2f}".format(e.amount) }} {{ e.currency }}</td>
+        <td><div class="tag-list">{% for tag in e.tags %}{% include "tags/_chip.html" %}{% endfor %}</div></td>
+      </tr>
+    {% else %}
+      <tr><td colspan="5" class="muted">You have no expenses yet.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</form>
+{% endif %}
+{% endblock %}

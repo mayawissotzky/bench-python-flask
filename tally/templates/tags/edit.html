@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Edit tag · Tally{% endblock %}
+{% block content %}
+<section class="card narrow">
+  <h1>Edit tag</h1>
+  <form method="post" action="{{ url_for('tags.edit', tag_id=tag.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>Name <input name="name" value="{{ tag.name }}" required maxlength="40"></label>
+    <label>Colour
+      <select name="color">
+        {% for c in colors %}<option value="{{ c }}" {% if tag.color == c %}selected{% endif %}>{{ c|title }}</option>{% endfor %}
+      </select>
+    </label>
+    <label>Description <input name="description" value="{{ tag.description }}" maxlength="200"></label>
+    <div class="actions">
+      <button type="submit">Save</button>
+      <a href="{{ url_for('tags.detail', tag_id=tag.id) }}">Cancel</a>
+    </div>
+  </form>
+</section>
+<section class="card narrow">
+  <h2>Delete tag</h2>
+  <p class="muted">Removes the tag from {{ tag.expenses|length }} expense(s). The expenses themselves are kept.</p>
+  <form method="post" action="{{ url_for('tags.delete', tag_id=tag.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="danger">Delete tag</button>
+  </form>
+</section>
+{% endblock %}
