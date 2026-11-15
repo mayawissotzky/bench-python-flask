@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% from "recurring/_macros.html" import amount, state_pill, totals_line %}
+{% block title %}Recurring expenses - Tally{% endblock %}
+{% block content %}
+<div class="toolbar">
+  <h1>Recurring expenses</h1>
+  <div class="actions">
+    <form method="post" action="{{ url_for('recurring.generate') }}">
+      <button type="submit">Create due expenses</button>
+    </form>
+    <a class="button" href="{{ url_for('recurring.create') }}">New schedule</a>
+  </div>
+</div>
+<p class="muted">
+  Subscriptions, rent, phone plans and other costs that come back on a fixed schedule.
+  Due occurrences are added to <a href="{{ url_for('expenses.index') }}">My expenses</a> as pending expenses.
+</p>
+{{ totals_line(totals, "Active schedules cost about") }}
+<table class="grid">
+  <thead>
+    <tr><th>Description</th><th>Category</th><th>Frequency</th><th class="num">Amount</th><th>Next due</th><th>Status</th></tr>
+  </thead>
+  <tbody>
+  {% for s in schedules %}
+    <tr>
+      <td><a href="{{ url_for('recurring.detail', schedule_id=s.id) }}">{{ s.description }}</a></td>
+      <td>{{ s.category|title }}</td>
+      <td>{{ frequencies[s.frequency] }}</td>
+      <td class="num">{{ amount(s.amount, s.currency) }}</td>
+      <td>{% if s.state == "finished" %}<span class="muted">-</span>{% else %}{{ s.next_due }}{% endif %}</td>
+      <td>{{ state_pill(s) }}</td>
+    </tr>
+  {% else %}
+    <tr><td colspan="6" class="muted">No recurring expenses yet.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% if current_user.is_manager and current_user.team_id %}
+  <p><a href="{{ url_for('recurring.team') }}">See recurring expenses across the team</a></p>
+{% endif %}
+{% endblock %}

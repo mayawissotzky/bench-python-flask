@@ -30,3 +30,6 @@ button, .button { background: var(--accent); color: #fff; border: 0; border-radi
 button.link { background: none; color: var(--accent); padding: 0; }
 button.danger { background: #dc2626; }
 form.inline { display: flex; gap: .25rem; align-items: center; }
+.actions { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; margin-top: 1rem; }
+.toolbar .actions { margin-top: 0; }
+.pill-active { background: #dcfce7; } .pill-paused { background: #fef9c3; } .pill-finished { background: #e5e7eb; }

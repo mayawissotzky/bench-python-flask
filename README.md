@@ -10,6 +10,7 @@ yearly reports for their team (with a CSV export for the bookkeeper).
 - Teams with a manager and members
 - Expenses with categories, receipt notes and an approval workflow
 - Status e-mails to the expense owner when an expense is approved or rejected
+- Recurring expenses (subscriptions, rent, phone plans) that turn into pending expenses when due
 - Monthly / category / yearly team reports and CSV export
 - Profile page (display name, website, short bio)
 - Small JSON API for the mobile companion app
@@ -50,3 +51,38 @@ All settings are read from environment variables (see `.env.example`):
 | `MAIL_ENABLED` | Set to `1` to actually send e-mails |
 | `REPORTING_API_URL` | Finance reporting service that receives published monthly summaries |
 | `SENTRY_DSN` | Optional error reporting |
+
+## Recurring expenses
+
+Costs that come back on a fixed schedule can be set up once under **Recurring**
+instead of being re-entered every month.
+
+- A schedule has a description, category, amount, currency, a frequency
+  (weekly, monthly, quarterly or yearly), a first occurrence and an optional
+  last occurrence.
+- Monthly, quarterly and yearly schedules keep the day of the first occurrence:
+  a schedule starting on the 31st lands on the last day of shorter months and
+  returns to the 31st afterwards.
+- **Create due expenses** on the Recurring page adds a pending expense to
+  *My expenses* for every occurrence that is due, which then goes through the
+  normal approval flow. At most 24 occurrences are created per schedule in one
+  run.
+- Schedules can be paused, resumed, edited, or told to skip their next
+  occurrence. Deleting a schedule keeps the expenses it already created.
+- Managers get a read-only overview of the recurring expenses of everyone on
+  their team at `/recurring/team`.
+
+To create due expenses for every user, for example from a daily cron job:
+
+```bash
+flask --app wsgi generate-recurring
+flask --app wsgi generate-recurring --date 2026-12-01   # treat that day as today
+```
+
+The new tables are created by `flask --app wsgi init-db`.
+
+### Tests
+
+```bash
+python -m unittest discover tests
+```

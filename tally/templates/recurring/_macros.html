@@ -1,0 +1,16 @@
+{% macro amount(value, currency) -%}
+  {{ "{:,.2f}".format(value) }} {{ currency }}
+{%- endmacro %}
+
+{% macro state_pill(schedule) -%}
+  <span class="pill pill-{{ schedule.state }}">{{ schedule.state }}</span>
+{%- endmacro %}
+
+{% macro totals_line(totals, label) -%}
+  {% if totals %}
+    <p class="muted">{{ label }}:
+      {% for currency, total in totals %}{{ amount(total, currency) }}{% if not loop.last %}, {% endif %}{% endfor %}
+      per month
+    </p>
+  {% endif %}
+{%- endmacro %}

@@ -4,7 +4,8 @@ from decimal import Decimal
 import click
 
 from .extensions import db
-from .models import Expense, Team, User
+from .models import Expense, RecurringExpense, Team, User
+from .services import recurring
 
 
 def register_commands(app):
@@ -46,5 +47,23 @@ def register_commands(app):
                     spent_on=today - timedelta(days=offset * 3),
                 )
             )
+        db.session.add(
+            RecurringExpense(
+                owner_id=manager.id,
+                description="Office internet",
+                category="office",
+                amount=Decimal("59.00"),
+                frequency="monthly",
+                start_date=today.replace(day=1),
+                next_due=today.replace(day=1),
+            )
+        )
         db.session.commit()
         click.echo("Seeded demo data.")
+
+    @app.cli.command("generate-recurring")
+    @click.option("--date", "on", type=click.DateTime(formats=["%Y-%m-%d"]), help="Treat this day as today.")
+    def generate_recurring(on):
+        """Create pending expenses for every due recurring schedule."""
+        created = recurring.generate_due_for_all(on.date() if on else None)
+        click.echo(f"Created {created} expense(s) from recurring schedules.")

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% from "recurring/_macros.html" import amount, state_pill, totals_line %}
+{% block title %}Team recurring expenses - Tally{% endblock %}
+{% block content %}
+<h1>{{ current_user.team.name }}: recurring expenses</h1>
+{{ totals_line(totals, "Active schedules across the team cost about") }}
+{% for member, schedules in by_member %}
+<section class="card">
+  <h2>{{ member.name }}</h2>
+  <table class="grid">
+    <thead><tr><th>Description</th><th>Frequency</th><th class="num">Amount</th><th>Next due</th><th>Status</th></tr></thead>
+    <tbody>
+    {% for s in schedules %}
+      <tr>
+        <td>{{ s.description }}</td>
+        <td>{{ frequencies[s.frequency] }}</td>
+        <td class="num">{{ amount(s.amount, s.currency) }}</td>
+        <td>{% if s.state == "finished" %}<span class="muted">-</span>{% else %}{{ s.next_due }}{% endif %}</td>
+        <td>{{ state_pill(s) }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% else %}
+<p class="muted">Nobody on the team has a recurring expense yet.</p>
+{% endfor %}
+{% endblock %}

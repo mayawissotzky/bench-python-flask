@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% from "recurring/_macros.html" import amount, state_pill %}
+{% block title %}{{ schedule.description }} - Tally{% endblock %}
+{% block content %}
+<p><a href="{{ url_for('recurring.index') }}">&larr; Recurring expenses</a></p>
+<section class="card">
+  <div class="toolbar">
+    <h1>{{ schedule.description }}</h1>
+    {{ state_pill(schedule) }}
+  </div>
+  <div class="facts">
+    <span class="muted">Amount</span><span>{{ amount(schedule.amount, schedule.currency) }}</span>
+    <span class="muted">Repeats</span><span>{{ frequencies[schedule.frequency] }}</span>
+    <span class="muted">Per month</span><span>about {{ amount(monthly, schedule.currency) }}</span>
+    <span class="muted">Category</span><span>{{ schedule.category|title }}</span>
+    <span class="muted">Starts</span><span>{{ schedule.start_date }}</span>
+    <span class="muted">Ends</span><span>{{ schedule.end_date or "No end date" }}</span>
+    <span class="muted">Created so far</span><span>{{ schedule.occurrences }}</span>
+    {% if schedule.last_generated_at %}
+      <span class="muted">Last run</span><span>{{ schedule.last_generated_at.strftime("%Y-%m-%d %H:%M") }} UTC</span>
+    {% endif %}
+  </div>
+  {% if schedule.notes %}<p class="notes">{{ schedule.notes }}</p>{% endif %}
+  <div class="actions">
+    <a class="button" href="{{ url_for('recurring.edit', schedule_id=schedule.id) }}">Edit</a>
+    {% if schedule.state == "active" %}
+      <form method="post" action="{{ url_for('recurring.skip', schedule_id=schedule.id) }}"><button type="submit">Skip next</button></form>
+      <form method="post" action="{{ url_for('recurring.pause', schedule_id=schedule.id) }}"><button type="submit">Pause</button></form>
+    {% elif schedule.state == "paused" %}
+      <form method="post" action="{{ url_for('recurring.resume', schedule_id=schedule.id) }}"><button type="submit">Resume</button></form>
+    {% endif %}
+    <form method="post" action="{{ url_for('recurring.delete', schedule_id=schedule.id) }}"><button type="submit" class="danger">Delete</button></form>
+  </div>
+</section>
+
+{% if upcoming %}
+<section class="card">
+  <h2>Coming up</h2>
+  <ul>
+    {% for due in upcoming %}<li>{{ due.strftime("%a %d %b %Y") }}</li>{% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+<section class="card">
+  <h2>Created expenses</h2>
+  <table class="grid">
+    <thead><tr><th>Due</th><th>Expense</th><th>Status</th></tr></thead>
+    <tbody>
+    {% for run in schedule.runs %}
+      <tr>
+        <td>{{ run.due_on }}</td>
+        {% if run.expense %}
+          <td><a href="{{ url_for('expenses.detail', expense_id=run.expense.id) }}">{{ run.expense.description }}</a></td>
+          <td><span class="pill pill-{{ run.expense.status }}">{{ run.expense.status }}</span></td>
+        {% else %}
+          <td colspan="2" class="muted">Expense was deleted</td>
+        {% endif %}
+      </tr>
+    {% else %}
+      <tr><td colspan="3" class="muted">Nothing created yet.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}
