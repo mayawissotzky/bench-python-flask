@@ -1,0 +1,10 @@
+{# Usage bar for one BudgetLine; expects `line` in scope. #}
+{% if line.budget %}
+  <meter class="budget-meter"
+         min="0" max="{{ line.limit }}" value="{{ line.spent }}"
+         low="{{ line.limit * line.budget.warn_at_percent / 100 }}" high="{{ line.limit }}" optimum="0"
+         title="{{ line.percent_used }}% used">{{ line.percent_used }}%</meter>
+  <span class="pill pill-budget-{{ line.state }}">{{ line.percent_used }}%</span>
+{% else %}
+  <span class="pill pill-budget-unbudgeted">no budget</span>
+{% endif %}

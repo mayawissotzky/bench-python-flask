@@ -4,7 +4,7 @@ from decimal import Decimal
 import click
 
 from .extensions import db
-from .models import Expense, Team, User
+from .models import Budget, Expense, Team, User
 
 
 def register_commands(app):
@@ -44,6 +44,18 @@ def register_commands(app):
                     category=cat,
                     amount=Decimal(amount),
                     spent_on=today - timedelta(days=offset * 3),
+                )
+            )
+
+        month_start = today.replace(day=1)
+        for category, limit in [("travel", "400.00"), ("meals", "300.00"), ("software", "500.00")]:
+            db.session.add(
+                Budget(
+                    team_id=team.id,
+                    category=category,
+                    month=month_start,
+                    limit_amount=Decimal(limit),
+                    created_by_id=manager.id,
                 )
             )
         db.session.commit()

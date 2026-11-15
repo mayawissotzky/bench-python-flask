@@ -1,0 +1,6 @@
+<nav class="tabs">
+  <a href="{{ url_for('budgets.index', month=month) }}">Overview</a>
+  {% if current_user.is_manager %}<a href="{{ url_for('budgets.create', month=month) }}">Add budget</a>{% endif %}
+  <a href="{{ url_for('budgets.export_csv', month=month) }}">Download CSV</a>
+  <a href="{{ url_for('reports.monthly', month=month) }}">Monthly report</a>
+</nav>

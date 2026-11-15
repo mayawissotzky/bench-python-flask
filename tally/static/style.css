@@ -30,3 +30,14 @@ button, .button { background: var(--accent); color: #fff; border: 0; border-radi
 button.link { background: none; color: var(--accent); padding: 0; }
 button.danger { background: #dc2626; }
 form.inline { display: flex; gap: .25rem; align-items: center; }
+.small { font-size: .85rem; }
+.month-nav { display: flex; gap: 1rem; }
+.budget-totals { display: flex; flex-wrap: wrap; gap: 1.5rem; }
+.budget-meter { width: 8rem; height: .9rem; vertical-align: middle; }
+.budget-row-over td { background: #fef2f2; }
+.budget-copy { margin-top: 1rem; }
+.over { color: #b91c1c; font-weight: 600; }
+.pill-budget-ok { background: #dcfce7; }
+.pill-budget-warning { background: #fef3c7; }
+.pill-budget-over { background: #fee2e2; }
+.pill-budget-unbudgeted { background: #f3f4f6; color: var(--muted); }

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}{% if budget %}Edit budget{% else %}New budget{% endif %} · Tally{% endblock %}
+{% block content %}
+<h1>{% if budget %}Edit {{ budget.category|title }} budget for {{ month }}{% else %}New budget{% endif %}</h1>
+{% include "budgets/_nav.html" %}
+<section class="card">
+  {% if budget %}
+  <form method="post" action="{{ url_for('budgets.edit', budget_id=budget.id) }}">
+    <dl class="facts">
+      <dt>Category</dt><dd>{{ budget.category|title }}</dd>
+      <dt>Month</dt><dd>{{ month }}</dd>
+      {% if budget.created_by %}<dt>Created by</dt><dd>{{ budget.created_by.name }}</dd>{% endif %}
+    </dl>
+  {% else %}
+  <form method="post" action="{{ url_for('budgets.create') }}">
+    <label>Month <input type="month" name="month" value="{{ month }}" required></label>
+    <label>Category
+      <select name="category" required>
+        {% for c in categories %}<option value="{{ c }}" {% if c == selected_category %}selected{% endif %}>{{ c|title }}</option>{% endfor %}
+      </select>
+    </label>
+  {% endif %}
+    <label>Monthly limit
+      <input name="limit" inputmode="decimal" value="{{ budget.limit_amount if budget else '' }}" {% if not budget %}required{% endif %}>
+    </label>
+    <label>Currency <input name="currency" value="{{ budget.currency if budget else 'USD' }}" maxlength="3" pattern="[A-Za-z]{3}"></label>
+    <label>Warn at (% of limit)
+      <input type="number" name="warn_at_percent" min="1" max="100" value="{{ budget.warn_at_percent if budget else 80 }}">
+    </label>
+    <label>Note <input name="note" maxlength="255" value="{{ budget.note if budget else '' }}" placeholder="e.g. includes the offsite"></label>
+    <button type="submit">{% if budget %}Save changes{% else %}Add budget{% endif %}</button>
+  </form>
+  {% if budget %}
+  <form method="post" action="{{ url_for('budgets.delete', budget_id=budget.id) }}">
+    <button class="danger" type="submit">Remove budget</button>
+  </form>
+  {% endif %}
+</section>
+{% endblock %}

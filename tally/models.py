@@ -77,6 +77,43 @@ class Expense(db.Model):
         }
 
 
+class Budget(db.Model):
+    """A monthly spending limit for one expense category of a team."""
+
+    __tablename__ = "budgets"
+    __table_args__ = (
+        db.UniqueConstraint("team_id", "category", "month", name="uq_budgets_team_category_month"),
+        db.CheckConstraint("limit_amount > 0", name="ck_budgets_positive_limit"),
+    )
+
+    id = db.Column(db.Integer, primary_key=True)
+    team_id = db.Column(db.Integer, db.ForeignKey("teams.id"), nullable=False, index=True)
+    category = db.Column(db.String(40), nullable=False)
+    # Always the first day of the budgeted month.
+    month = db.Column(db.Date, nullable=False)
+    limit_amount = db.Column(db.Numeric(10, 2), nullable=False)
+    currency = db.Column(db.String(3), nullable=False, default="USD")
+    warn_at_percent = db.Column(db.Integer, nullable=False, default=80)
+    note = db.Column(db.String(255), nullable=False, default="")
+    created_by_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False, default=_now)
+    updated_at = db.Column(db.DateTime(timezone=True), nullable=False, default=_now, onupdate=_now)
+
+    team = db.relationship("Team")
+    created_by = db.relationship("User")
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "category": self.category,
+            "month": self.month.strftime("%Y-%m"),
+            "limit": str(self.limit_amount),
+            "currency": self.currency,
+            "warn_at_percent": self.warn_at_percent,
+            "note": self.note,
+        }
+
+
 @login_manager.user_loader
 def load_user(user_id):
     return db.session.get(User, int(user_id))

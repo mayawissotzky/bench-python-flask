@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Budgets · Tally{% endblock %}
+{% block content %}
+<div class="toolbar">
+  <h1>Budgets for {{ month }}</h1>
+  <div class="month-nav">
+    <a href="{{ url_for('budgets.index', month=previous_month) }}">&larr; {{ previous_month }}</a>
+    <a href="{{ url_for('budgets.index', month=next_month) }}">{{ next_month }} &rarr;</a>
+  </div>
+</div>
+{% include "budgets/_nav.html" %}
+
+<form class="filters" method="get">
+  <input type="month" name="month" value="{{ month }}">
+  <button type="submit">Show</button>
+</form>
+
+{% if totals %}
+<section class="card budget-totals">
+  {% for currency, entry in totals|dictsort %}
+    <div>
+      <strong>{{ entry.spent|money(currency) }}</strong>
+      <span class="muted">of {{ entry.limit|money(currency) }} budgeted · {{ entry.percent_used }}% used ·
+        {% if entry.remaining >= 0 %}{{ entry.remaining|money(currency) }} left{% else %}{{ (-entry.remaining)|money(currency) }} over{% endif %}</span>
+    </div>
+  {% endfor %}
+</section>
+{% endif %}
+
+<table class="grid">
+  <thead>
+    <tr>
+      <th>Category</th>
+      <th class="num">Budget</th>
+      <th class="num">Approved</th>
+      <th class="num">Pending</th>
+      <th class="num">Remaining</th>
+      <th>Usage</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for line in lines %}
+    <tr class="budget-row budget-row-{{ line.state }}">
+      <td>
+        <a href="{{ url_for('budgets.history', category=line.category, month=month) }}">{{ line.category|title }}</a>
+        {% if line.budget and line.budget.note %}<div class="muted small">{{ line.budget.note }}</div>{% endif %}
+      </td>
+      <td class="num">{% if line.budget %}{{ line.limit|money(line.currency) }}{% else %}<span class="muted">&mdash;</span>{% endif %}</td>
+      <td class="num">{{ line.approved|money(line.currency) }}</td>
+      <td class="num">{{ line.pending|money(line.currency) }}</td>
+      <td class="num">
+        {% if line.budget %}
+          {% if line.remaining >= 0 %}{{ line.remaining|money(line.currency) }}{% else %}<span class="over">{{ (-line.remaining)|money(line.currency) }} over</span>{% endif %}
+        {% else %}<span class="muted">&mdash;</span>{% endif %}
+      </td>
+      <td>{% include "budgets/_meter.html" %}</td>
+      <td>
+        {% if current_user.is_manager %}
+          {% if line.budget %}
+            <a href="{{ url_for('budgets.edit', budget_id=line.budget.id) }}">Edit</a>
+          {% else %}
+            <a href="{{ url_for('budgets.create', month=month, category=line.category) }}">Set budget</a>
+          {% endif %}
+        {% endif %}
+      </td>
+    </tr>
+  {% else %}
+    <tr><td colspan="7" class="muted">No budgets or spend recorded for {{ month }}.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+{% if current_user.is_manager %}
+<form method="post" action="{{ url_for('budgets.copy_previous') }}" class="inline budget-copy">
+  <input type="hidden" name="month" value="{{ month }}">
+  <button type="submit">Copy budgets from {{ previous_month }}</button>
+  <span class="muted">Existing budgets for {{ month }} are kept.</span>
+</form>
+{% endif %}
+<p class="muted small">Rejected expenses are not counted. Expenses in a different currency than the category's budget are listed as separate rows.</p>
+{% endblock %}

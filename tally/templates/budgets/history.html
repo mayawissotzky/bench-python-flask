@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}{{ category|title }} budget history · Tally{% endblock %}
+{% block content %}
+<h1>{{ category|title }} &mdash; last {{ rows|length }} months</h1>
+{% include "budgets/_nav.html" %}
+<table class="grid">
+  <thead>
+    <tr><th>Month</th><th class="num">Budget</th><th class="num">Spent</th><th class="num">Expenses</th><th>Usage</th></tr>
+  </thead>
+  <tbody>
+  {% for row in rows %}
+    {% set line = row.line %}
+    <tr class="budget-row budget-row-{{ line.state }}">
+      <td><a href="{{ url_for('budgets.index', month=row.month.strftime('%Y-%m')) }}">{{ row.month.strftime('%Y-%m') }}</a></td>
+      <td class="num">{% if line.budget %}{{ line.limit|money(line.currency) }}{% else %}<span class="muted">&mdash;</span>{% endif %}</td>
+      <td class="num">{% if line.budget %}{{ line.spent|money(line.currency) }}{% else %}{{ "{:,.2f}".format(line.spent) }}{% endif %}</td>
+      <td class="num">{{ line.expense_count }}</td>
+      <td>{% include "budgets/_meter.html" %}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
