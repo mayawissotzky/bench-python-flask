@@ -17,6 +17,7 @@
   <input type="date" name="to" value="{{ filters.get('to', '') }}">
   <button type="submit">Filter</button>
   <a href="{{ url_for('expenses.search') }}">Search</a>
+  <a href="{{ url_for('expenses.duplicate_groups') }}">Possible duplicates</a>
 </form>
 {% include "expenses/_table.html" %}
 {% endblock %}

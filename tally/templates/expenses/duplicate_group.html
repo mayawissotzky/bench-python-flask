@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Review duplicates - Tally{% endblock %}
+{% block content %}
+<div class="toolbar">
+  <h1>Review duplicates</h1>
+  <a href="{{ url_for('expenses.duplicate_groups', match=match) }}">All groups</a>
+</div>
+<p class="muted">Pick the expense to keep. Notes from the others are copied onto it and the others are removed.</p>
+<form method="post" action="{{ url_for('expenses.merge_duplicates') }}">
+  <table class="grid">
+    <thead><tr><th>Keep</th><th>Merge</th><th>Date</th><th>Description</th><th>Category</th><th class="num">Amount</th><th>Status</th></tr></thead>
+    <tbody>
+    {% for row in rows %}
+      <tr>
+        <td><input type="radio" name="keep" value="{{ row.id }}" {% if loop.first %}checked{% endif %}></td>
+        <td><input type="checkbox" name="merge" value="{{ row.id }}" {% if not loop.first %}checked{% endif %}></td>
+        <td>{{ row.spent_on }}</td>
+        <td><a href="{{ url_for('expenses.detail', expense_id=row.id) }}">{{ row.description|highlight(key) }}</a></td>
+        <td>{{ row.category|title }}</td>
+        <td class="num">{{ row.amount|money(row.currency) }}</td>
+        <td><span class="pill pill-{{ row.status }}">{{ row.status }}</span></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <button type="submit">Merge selected</button>
+</form>
+{% endblock %}
