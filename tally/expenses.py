@@ -4,7 +4,7 @@ from sqlalchemy import select, text
 
 from .extensions import db
 from .models import Expense
-from .services import expense_service, mailer
+from .services import duplicates, expense_service, mailer
 
 bp = Blueprint("expenses", __name__, url_prefix="/expenses")
 
@@ -35,6 +35,48 @@ def search():
             {"owner": current_user.id},
         ).mappings().all()
     return render_template("expenses/search.html", rows=rows, q=q)
+
+
+@bp.get("/duplicates")
+@login_required
+def duplicate_groups():
+    match = request.args.get("match", "description")
+    since = expense_service.parse_date(request.args["since"]) if request.args.get("since") else None
+    groups = duplicates.find_groups(current_user.id, match, since)
+    return render_template(
+        "expenses/duplicates.html",
+        groups=groups,
+        match=match,
+        since=request.args.get("since", ""),
+        match_options=duplicates.MATCH_COLUMNS,
+    )
+
+
+@bp.get("/duplicates/group")
+@login_required
+def duplicate_group():
+    match = request.args.get("match", "description")
+    key = request.args.get("key", "")
+    rows = duplicates.group_members(current_user.id, match, key)
+    if not rows:
+        abort(404)
+    return render_template("expenses/duplicate_group.html", rows=rows, match=match, key=key)
+
+
+@bp.post("/duplicates/merge")
+@login_required
+def merge_duplicates():
+    keep = db.first_or_404(
+        select(Expense).filter_by(id=request.form.get("keep", type=int), owner_id=current_user.id)
+    )
+    others = []
+    for other_id in request.form.getlist("merge", type=int):
+        expense = db.session.get(Expense, other_id)
+        if expense is not None:
+            others.append(expense)
+    merged = duplicates.merge_into(keep, others)
+    flash(f"Merged {merged} expense(s) into #{keep.id}.", "success")
+    return redirect(url_for("expenses.detail", expense_id=keep.id))
 
 
 @bp.route("/new", methods=["GET", "POST"])

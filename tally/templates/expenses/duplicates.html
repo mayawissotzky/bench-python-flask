@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Possible duplicates - Tally{% endblock %}
+{% block content %}
+<div class="toolbar">
+  <h1>Possible duplicates</h1>
+  <a href="{{ url_for('expenses.index') }}">Back to my expenses</a>
+</div>
+<form class="filters" method="get">
+  <label>Match on
+    <select name="match">
+      {% for option in match_options %}<option value="{{ option }}" {% if option == match %}selected{% endif %}>{{ option|title }}</option>{% endfor %}
+    </select>
+  </label>
+  <label>Since <input type="date" name="since" value="{{ since }}"></label>
+  <button type="submit">Check</button>
+</form>
+<table class="grid">
+  <thead><tr><th>{{ match|title }}</th><th class="num">Expenses</th><th class="num">Total</th><th>First</th><th>Last</th><th></th></tr></thead>
+  <tbody>
+  {% for g in groups %}
+    <tr>
+      <td>{{ g.match_key }}</td>
+      <td class="num">{{ g.count }}</td>
+      <td class="num">{{ g.total|money }}</td>
+      <td>{{ g.first_seen }}</td>
+      <td>{{ g.last_seen }}</td>
+      <td><a href="{{ url_for('expenses.duplicate_group', match=match, key=g.match_key) }}">Review</a></td>
+    </tr>
+  {% else %}
+    <tr><td colspan="6" class="muted">No duplicates found.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
