@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from sqlalchemy import text
 
 from ..extensions import db
@@ -34,3 +36,29 @@ def yearly_totals(team_id, year):
         "GROUP BY 1 ORDER BY 1"
     )
     return db.session.execute(sql, {"team": team_id}).mappings().all()
+
+
+def member_totals(team_id, month_start, month_end):
+    sql = text(
+        "SELECT u.id AS user_id, u.name, "
+        "COUNT(e.id) AS expense_count, "
+        "COALESCE(SUM(e.amount) FILTER (WHERE e.status = 'approved'), 0) AS approved, "
+        "COALESCE(SUM(e.amount) FILTER (WHERE e.status = 'pending'), 0) AS pending "
+        "FROM users u LEFT JOIN expenses e ON e.owner_id = u.id AND e.team_id = :team "
+        "AND e.spent_on >= :start AND e.spent_on < :end "
+        "WHERE u.team_id = :team GROUP BY u.id, u.name ORDER BY approved DESC, u.name"
+    )
+    rows = db.session.execute(sql, {"team": team_id, "start": month_start, "end": month_end}).mappings().all()
+    return with_shares(rows)
+
+
+def with_shares(rows):
+    """Add each member's share (0-100) of the team's approved spend."""
+    team_total = sum((Decimal(row["approved"]) for row in rows), Decimal("0"))
+    result = []
+    for row in rows:
+        share = Decimal("0")
+        if team_total:
+            share = (Decimal(row["approved"]) * 100 / team_total).quantize(Decimal("0.1"))
+        result.append({**row, "share": share})
+    return result
