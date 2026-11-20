@@ -21,6 +21,18 @@
   {% endif %}
 </section>
 
+<section class="card" id="comments" data-expense-id="{{ expense.id }}" data-user-id="{{ current_user.id }}">
+  <h2>Comments</h2>
+  <ul class="comments"></ul>
+  {% if expense.owner_id == current_user.id %}
+  <form class="comment-form">
+    <textarea name="body" rows="2" placeholder="Add a comment"></textarea>
+    <button type="submit">Comment</button>
+  </form>
+  {% endif %}
+</section>
+<script src="{{ url_for('static', filename='comments.js') }}" defer></script>
+
 <section class="card">
   <h2>Edit</h2>
   <form method="post" action="{{ url_for('expenses.edit', expense_id=expense.id) }}">
