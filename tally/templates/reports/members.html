@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Spend by member</h1>
+{% include "reports/_nav.html" %}
+<form class="filters" method="get">
+  <input type="month" name="month" value="{{ month }}">
+  <button type="submit">Show</button>
+  <a href="{{ url_for('reports.members_csv', month=month) }}">Download CSV</a>
+</form>
+<table class="grid">
+  <thead><tr>
+    <th>Member</th>
+    <th class="num">Expenses</th>
+    <th class="num">Approved</th>
+    <th class="num">Pending</th>
+    <th class="num">Share</th>
+  </tr></thead>
+  <tbody>
+  {% for row in rows %}<tr>
+    <td>{{ row.name }}</td>
+    <td class="num">{{ row.expense_count }}</td>
+    <td class="num">{{ row.approved|money }}</td>
+    <td class="num">{{ row.pending|money }}</td>
+    <td class="num">{{ row.share }}%</td>
+  </tr>
+  {% else %}<tr><td colspan="5" class="muted">No members on this team yet.</td></tr>{% endfor %}
+  </tbody>
+  {% if rows %}
+  <tfoot><tr>
+    <th>Team</th>
+    <th class="num">{{ totals.expense_count }}</th>
+    <th class="num">{{ totals.approved|money }}</th>
+    <th class="num">{{ totals.pending|money }}</th>
+    <th class="num">100%</th>
+  </tr></tfoot>
+  {% endif %}
+</table>
+{% endblock %}
