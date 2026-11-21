@@ -14,6 +14,7 @@ def create_app(config_object="tally.config.Config"):
     from .cli import register_commands
     from .reports.routes import bp as reports_bp
     from .services.formatting import format_amount, team_badge
+    from .tags import bp as tags_bp
     from .teams import bp as teams_bp
 
     app.register_blueprint(auth.bp)
@@ -23,6 +24,7 @@ def create_app(config_object="tally.config.Config"):
     app.register_blueprint(profile.bp)
     app.register_blueprint(api.bp)
     app.register_blueprint(exports.bp)
+    app.register_blueprint(tags_bp)
 
     app.jinja_env.globals["team_badge"] = team_badge
     app.jinja_env.filters["money"] = format_amount

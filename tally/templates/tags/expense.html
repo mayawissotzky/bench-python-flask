@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Tag expense · Tally{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>Tags for “{{ expense.description }}”</h1>
+  <p class="muted">
+    {{ expense.spent_on }} · {{ expense.category|title }} · {{ "{:,.2f}".format(expense.amount) }} {{ expense.currency }}
+    · <a href="{{ url_for('expenses.detail', expense_id=expense.id) }}">Open expense</a>
+  </p>
+  {% if expense.tags %}
+    <div class="tag-list">{% for tag in expense.tags %}{% include "tags/_chip.html" %}{% endfor %}</div>
+  {% endif %}
+</section>
+<section class="card">
+  {% if tags %}
+  <form method="post" action="{{ url_for('tags.expense_tags', expense_id=expense.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <p class="muted">Pick up to {{ max_per_expense }} tags.</p>
+    <div class="tag-picker">
+      {% for tag in tags %}
+        <label class="inline">
+          <input type="checkbox" name="tag_id" value="{{ tag.id }}" {% if tag.id in selected %}checked{% endif %}>
+          <span class="tag tag-{{ tag.color }}">{{ tag.name }}</span>
+        </label>
+      {% endfor %}
+    </div>
+    <p><button type="submit">Save tags</button></p>
+  </form>
+  {% else %}
+    <p class="muted">You have no tags yet. <a href="{{ url_for('tags.index') }}">Create one</a> first.</p>
+  {% endif %}
+</section>
+{% endblock %}

@@ -77,6 +77,37 @@ class Expense(db.Model):
         }
 
 
+expense_tags = db.Table(
+    "expense_tags",
+    db.Column("expense_id", db.Integer, db.ForeignKey("expenses.id", ondelete="CASCADE"), primary_key=True),
+    db.Column("tag_id", db.Integer, db.ForeignKey("tags.id", ondelete="CASCADE"), primary_key=True),
+)
+
+
+class Tag(db.Model):
+    """A personal label a user can attach to any of their own expenses."""
+
+    __tablename__ = "tags"
+    __table_args__ = (db.UniqueConstraint("owner_id", "name", name="uq_tags_owner_name"),)
+
+    id = db.Column(db.Integer, primary_key=True)
+    owner_id = db.Column(db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    name = db.Column(db.String(40), nullable=False)
+    color = db.Column(db.String(16), nullable=False, default="slate")
+    description = db.Column(db.String(200), nullable=False, default="")
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False, default=_now)
+
+    owner = db.relationship("User")
+    expenses = db.relationship(
+        "Expense",
+        secondary=expense_tags,
+        backref=db.backref("tags", lazy="selectin", order_by="Tag.name"),
+    )
+
+    def to_dict(self):
+        return {"id": self.id, "name": self.name, "color": self.color, "description": self.description}
+
+
 @login_manager.user_loader
 def load_user(user_id):
     return db.session.get(User, int(user_id))
