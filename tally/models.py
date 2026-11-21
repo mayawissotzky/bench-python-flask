@@ -77,6 +77,27 @@ class Expense(db.Model):
         }
 
 
+class Comment(db.Model):
+    __tablename__ = "comments"
+
+    id = db.Column(db.Integer, primary_key=True)
+    expense_id = db.Column(db.Integer, db.ForeignKey("expenses.id"), nullable=False, index=True)
+    author_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    body = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False, default=_now)
+
+    author = db.relationship("User")
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "author": self.author.name,
+            "author_id": self.author_id,
+            "body": self.body,
+            "created_at": self.created_at.isoformat(),
+        }
+
+
 @login_manager.user_loader
 def load_user(user_id):
     return db.session.get(User, int(user_id))
