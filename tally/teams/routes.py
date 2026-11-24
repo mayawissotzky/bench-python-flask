@@ -3,9 +3,9 @@ from flask_login import current_user
 from sqlalchemy import select
 
 from ..extensions import db
-from ..models import Expense, Team
+from ..models import Expense, Team, User
 from . import bp
-from .directory import list_members
+from .directory import ROLES, leaves_team_without_manager, list_members
 
 
 @bp.route("/new", methods=["GET", "POST"])
@@ -41,7 +41,49 @@ def expenses(team_id):
 def members(team_id):
     role = request.args.get("role", "")
     rows = list_members(team_id, role)
-    return render_template("teams/members.html", team=db.session.get(Team, team_id), members=rows, role=role)
+    return render_template(
+        "teams/members.html", team=db.session.get(Team, team_id), members=rows, role=role, roles=ROLES
+    )
+
+
+def _manager_ids(team_id):
+    return db.session.scalars(select(User.id).where(User.team_id == team_id, User.role == "manager")).all()
+
+
+def _managed_member(team_id, user_id):
+    if not current_user.is_manager:
+        abort(403)
+    return db.get_or_404(User, user_id)
+
+
+@bp.post("/<int:team_id>/members/<int:user_id>/role")
+def change_role(team_id, user_id):
+    member = _managed_member(team_id, user_id)
+    new_role = request.form.get("role")
+    if new_role not in ROLES:
+        abort(400)
+    if leaves_team_without_manager(_manager_ids(team_id), member.id, new_role):
+        flash("A team needs at least one manager.", "error")
+    else:
+        member.role = new_role
+        db.session.commit()
+        flash(f"{member.name} is now a {new_role}.", "success")
+    return redirect(url_for("teams.members", team_id=team_id))
+
+
+@bp.post("/<int:team_id>/members/<int:user_id>/remove")
+def remove_member(team_id, user_id):
+    member = _managed_member(team_id, user_id)
+    if member.id == current_user.id:
+        flash("You can't remove yourself from the team.", "error")
+    elif leaves_team_without_manager(_manager_ids(team_id), member.id):
+        flash("A team needs at least one manager.", "error")
+    else:
+        member.team_id = None
+        member.role = "member"
+        db.session.commit()
+        flash(f"{member.name} was removed from the team.", "success")
+    return redirect(url_for("teams.members", team_id=team_id))
 
 
 @bp.route("/<int:team_id>/settings", methods=["GET", "POST"])
