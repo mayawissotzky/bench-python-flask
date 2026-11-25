@@ -12,6 +12,7 @@
     {% if current_user.is_authenticated %}
       <nav>
         <a href="{{ url_for('expenses.index') }}">My expenses</a>
+        <a href="{{ url_for('recurring.index') }}">Recurring</a>
         {% if current_user.team_id %}
           <a href="{{ url_for('teams.expenses', team_id=current_user.team_id) }}">Team</a>
           <a href="{{ url_for('reports.monthly') }}">Reports</a>

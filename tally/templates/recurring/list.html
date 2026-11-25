@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="toolbar">
+  <h1>Recurring expenses</h1>
+</div>
+{% if banner %}<p class="flash flash-info">{{ banner }}</p>{% endif %}
+<form class="filters" method="get">
+  <select name="category">
+    <option value="">All categories</option>
+    {% for c in categories %}<option value="{{ c }}" {% if category == c %}selected{% endif %}>{{ c|title }}</option>{% endfor %}
+  </select>
+  <button type="submit">Filter</button>
+</form>
+<table class="grid">
+  <thead><tr><th>Description</th><th>Category</th><th class="num">Amount</th><th>Day</th><th>Last logged</th><th></th></tr></thead>
+  <tbody>
+  {% for r in rows %}
+    <tr{% if not r.active %} class="muted"{% endif %}>
+      <td>{{ r.description }}</td>
+      <td>{{ r.category|title }}</td>
+      <td class="num">{{ r.amount|money(r.currency) }}</td>
+      <td>{{ r.day_of_month }}</td>
+      <td>{{ r.last_run_on or "never" }}</td>
+      <td>
+        {% if r.active %}<form method="post" action="{{ url_for('recurring.log_now', recurring_id=r.id) }}"><button class="link">Log now</button></form>{% endif %}
+        <form method="post" action="{{ url_for('recurring.toggle', recurring_id=r.id) }}"><button class="link">{{ "Pause" if r.active else "Resume" }}</button></form>
+        <form method="post" action="{{ url_for('recurring.delete', recurring_id=r.id) }}"><button class="link">Remove</button></form>
+      </td>
+    </tr>
+  {% else %}
+    <tr><td colspan="6" class="muted">No recurring expenses yet.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+<h2>Add a recurring expense</h2>
+<form method="post" action="{{ url_for('recurring.create') }}" class="stack">
+  <input name="description" placeholder="Description" required maxlength="255">
+  <select name="category">{% for c in categories %}<option value="{{ c }}">{{ c|title }}</option>{% endfor %}</select>
+  <input name="amount" type="number" step="0.01" min="0.01" placeholder="Amount" required>
+  <input name="currency" value="USD" maxlength="3">
+  <input name="day_of_month" type="number" min="1" max="28" value="1" required>
+  <button type="submit">Add</button>
+</form>
+{% endblock %}
