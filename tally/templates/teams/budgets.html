@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ team.name }}</h1>
+{% include "teams/_nav.html" %}
+{% if banner %}<p class="flash flash-error">{{ banner }}</p>{% endif %}
+<p class="muted">Sort by:
+  {% for col in sortable %}
+    <a href="{{ url_for('teams.budgets', team_id=team.id, sort=col) }}"{% if col == sort %} class="active"{% endif %}>{{ col.replace('_', ' ') }}</a>
+  {% endfor %}
+</p>
+<table class="grid">
+  <thead><tr><th>Category</th><th class="num">Spent</th><th class="num">Limit</th><th>Note</th><th></th></tr></thead>
+  <tbody>
+  {% for b in rows %}
+    <tr>
+      <td>{{ b.category }}</td>
+      <td class="num">{{ b.spent|money }}</td>
+      <td class="num">{{ b.monthly_limit|money }}</td>
+      <td>{{ b.note|safe }}</td>
+      <td>
+        {% if current_user.is_manager %}
+        <form method="post" action="{{ url_for('teams.edit_budget', team_id=team.id, budget_id=b.id) }}" class="inline">
+          <input name="monthly_limit" value="{{ b.monthly_limit }}" size="8">
+          <input name="note" value="{{ b.note }}" placeholder="Note">
+          <button>Save</button>
+        </form>
+        <form method="post" action="{{ url_for('teams.delete_budget', team_id=team.id, budget_id=b.id) }}" class="inline">
+          <button class="danger">Remove</button>
+        </form>
+        {% endif %}
+      </td>
+    </tr>
+  {% else %}
+    <tr><td colspan="5" class="muted">No budgets yet.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% if current_user.is_manager %}
+<h2>Add a budget</h2>
+<form method="post" action="{{ url_for('teams.create_budget', team_id=team.id) }}">
+  <label>Category <input name="category" required maxlength="40"></label>
+  <label>Monthly limit <input name="monthly_limit" required></label>
+  <label>Note <input name="note" placeholder="Shown to the whole team"></label>
+  <button>Add</button>
+</form>
+{% endif %}
+{% endblock %}
