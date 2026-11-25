@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Shared pages</h1>
+<table class="grid">
+  <thead><tr><th>Title</th><th>Link</th><th></th></tr></thead>
+  <tbody>
+  {% for l in links %}
+    <tr>
+      <td>{{ l.title }}</td>
+      <td><a href="{{ url_for('share.view', token=l.token) }}">{{ url_for('share.view', token=l.token, _external=True) }}</a></td>
+      <td><form method="post" action="{{ url_for('share.delete', link_id=l.id) }}"><button class="link">Remove</button></form></td>
+    </tr>
+  {% else %}
+    <tr><td colspan="3" class="muted">Nothing shared yet.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+<h2>Share a page</h2>
+<form method="post" action="{{ url_for('share.create') }}" class="stack">
+  <input name="title" placeholder="Title" required maxlength="120">
+  <textarea name="message" placeholder="Message (HTML allowed)"></textarea>
+  <textarea name="note" placeholder="Note"></textarea>
+  <input name="link_url" placeholder="Receipt link" maxlength="500">
+  <button type="submit">Create link</button>
+</form>
+{% endblock %}

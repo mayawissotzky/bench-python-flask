@@ -77,6 +77,21 @@ class Expense(db.Model):
         }
 
 
+class ShareLink(db.Model):
+    __tablename__ = "share_links"
+
+    id = db.Column(db.Integer, primary_key=True)
+    token = db.Column(db.String(64), unique=True, nullable=False)
+    owner_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    title = db.Column(db.String(120), nullable=False)
+    message = db.Column(db.Text, nullable=False, default="")
+    note = db.Column(db.Text, nullable=False, default="")
+    link_url = db.Column(db.String(500), nullable=False, default="")
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False, default=_now)
+
+    owner = db.relationship("User")
+
+
 @login_manager.user_loader
 def load_user(user_id):
     return db.session.get(User, int(user_id))

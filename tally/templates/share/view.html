@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<article class="share" data-token="{{ link.token }}">
+  <h1>{{ heading }}</h1>
+  <p class="muted">Shared by {{ link.owner.name }} on {{ link.created_at.strftime('%d %b %Y') }}</p>
+
+  <div class="message">{{ link.message|safe }}</div>
+
+  {% if link.note %}
+  <h2>Note</h2>
+  <div class="note">{{ note_html|safe }}</div>
+  {% endif %}
+
+  {% if link.link_url %}
+  <p>
+    <a class="button" href="{{ link.link_url }}" rel="noopener">Open the receipt</a>
+  </p>
+  {% endif %}
+
+  <p class="muted" id="share-recent"></p>
+</article>
+<script src="{{ url_for('static', filename='share.js') }}"></script>
+{% endblock %}
