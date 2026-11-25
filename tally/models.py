@@ -77,6 +77,21 @@ class Expense(db.Model):
         }
 
 
+class RecurringExpense(db.Model):
+    __tablename__ = "recurring_expenses"
+
+    id = db.Column(db.Integer, primary_key=True)
+    owner_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    description = db.Column(db.String(255), nullable=False)
+    category = db.Column(db.String(40), nullable=False, default="other")
+    amount = db.Column(db.Numeric(10, 2), nullable=False)
+    currency = db.Column(db.String(3), nullable=False, default="USD")
+    day_of_month = db.Column(db.Integer, nullable=False, default=1)
+    active = db.Column(db.Boolean, nullable=False, default=True)
+    last_run_on = db.Column(db.Date)
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False, default=_now)
+
+
 @login_manager.user_loader
 def load_user(user_id):
     return db.session.get(User, int(user_id))
