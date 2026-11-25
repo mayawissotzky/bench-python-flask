@@ -10,7 +10,7 @@ yearly reports for their team (with a CSV export for the bookkeeper).
 - Teams with a manager and members
 - Expenses with categories, receipt notes and an approval workflow
 - Status e-mails to the expense owner when an expense is approved or rejected
-- Monthly / category / yearly team reports and CSV export
+- Monthly / category / yearly / per-member team reports and CSV export
 - Profile page (display name, website, short bio)
 - Small JSON API for the mobile companion app
 

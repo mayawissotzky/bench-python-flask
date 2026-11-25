@@ -80,3 +80,31 @@ def yearly():
         abort(400, "Year must be a number")
     rows = queries.yearly_totals(current_user.team_id, year)
     return render_template("reports/yearly.html", rows=rows, year=year)
+
+
+@bp.get("/members")
+def members():
+    start, end = _month_bounds(request.args.get("month"))
+    rows = queries.member_totals(current_user.team_id, start, end)
+    totals = {
+        "expense_count": sum(row["expense_count"] for row in rows),
+        "approved": sum(row["approved"] for row in rows),
+        "pending": sum(row["pending"] for row in rows),
+    }
+    return render_template("reports/members.html", rows=rows, totals=totals, month=start.strftime("%Y-%m"))
+
+
+@bp.get("/members.csv")
+def members_csv():
+    start, end = _month_bounds(request.args.get("month"))
+    rows = queries.member_totals(current_user.team_id, start, end)
+    buf = io.StringIO()
+    writer = csv.writer(buf)
+    writer.writerow(["member", "expenses", "approved", "pending", "share_percent"])
+    for row in rows:
+        writer.writerow([row["name"], row["expense_count"], row["approved"], row["pending"], row["share"]])
+    return Response(
+        buf.getvalue(),
+        mimetype="text/csv",
+        headers={"Content-Disposition": f"attachment; filename=tally-members-{start:%Y-%m}.csv"},
+    )
