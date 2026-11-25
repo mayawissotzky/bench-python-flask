@@ -1,9 +1,6 @@
 import re
 from decimal import Decimal
 
-# Right-to-left mark: keeps a symbol on the correct side of the number in RTL text.
-RLM = "\u200f"
-
 ISO_CODE = re.compile(r"^(?:AED|ARS|AUD|BRL|CAD|CHF|CLP|CNY|COP|CZK|DKK|EGP|EUR|GBP|HKD|HUF|IDR|ILS|INR|ISK|JPY|KES|KRW|KWD|MAD|MXN|MYR|NGN|NOK|NZD|PEN|PHP|PKR|PLN|QAR|RON|SAR|SEK|SGD|THB|TRY|TWD|UAH|USD|VND|ZAR)$")
 
 # code: (symbol, local name, decimals, right_to_left)
@@ -27,6 +24,10 @@ CATEGORY_ICONS = {
     "office": "🗂️",
     "other": "🧾",
 }
+
+
+# Right-to-left mark: keeps a symbol on the correct side of the number in RTL text.
+RLM = "\u200f"
 
 
 def normalize_code(code):
