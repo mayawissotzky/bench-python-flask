@@ -80,3 +80,26 @@ class Expense(db.Model):
 @login_manager.user_loader
 def load_user(user_id):
     return db.session.get(User, int(user_id))
+
+
+class SavedFilter(db.Model):
+    __tablename__ = "saved_filters"
+
+    id = db.Column(db.Integer, primary_key=True)
+    owner_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    team_id = db.Column(db.Integer, db.ForeignKey("teams.id"))
+    name = db.Column(db.String(80), nullable=False)
+    criteria = db.Column(db.JSON, nullable=False, default=dict)
+    shared = db.Column(db.Boolean, nullable=False, default=False)
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False, default=_now)
+
+    owner = db.relationship("User")
+
+    def to_dict(self):
+        return {
+            "key": self.id,
+            "name": self.name,
+            "criteria": self.criteria,
+            "shared": self.shared,
+            "owner": self.owner.name,
+        }
