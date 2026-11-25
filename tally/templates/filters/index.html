@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Saved filters</h1>
+<p class="muted">Save a combination of category, status and currency to rerun it later. Shared filters are visible to your team.</p>
+<form id="new-filter">
+  <label>Name <input name="name" required maxlength="80"></label>
+  <label>Category <input name="category"></label>
+  <label>Status <input name="status"></label>
+  <label>Currency <input name="currency" maxlength="3"></label>
+  <label><input type="checkbox" name="shared"> Share with my team</label>
+  <button>Save filter</button>
+</form>
+<ul id="filter-list" class="cards"></ul>
+<template id="filter-card">
+  <li class="card"><span class="pill"></span> <small class="muted"></small></li>
+</template>
+<script src="{{ url_for('static', filename='filters.js') }}"></script>
+{% endblock %}
