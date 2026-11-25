@@ -1,8 +1,6 @@
 from markupsafe import Markup
 
-
-def format_amount(amount, currency="USD"):
-    return f"{currency} {amount:,.2f}"
+from .currency import category_icon, currency_name, format_amount  # noqa: F401
 
 
 def team_badge(team):
