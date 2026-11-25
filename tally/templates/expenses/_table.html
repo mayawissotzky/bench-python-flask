@@ -5,8 +5,8 @@
     <tr>
       <td>{{ row.spent_on }}</td>
       <td><a href="{{ url_for('expenses.detail', expense_id=row.id) }}">{{ row.description }}</a></td>
-      <td>{{ row.category }}</td>
-      <td class="num">{{ row.amount|money(row.currency) }}</td>
+      <td>{{ row.category|category_icon }} {{ row.category }}</td>
+      <td class="num" title="{{ row.currency|currency_name }}">{{ row.amount|money(row.currency) }}</td>
       <td><span class="pill pill-{{ row.status }}">{{ row.status }}</span></td>
     </tr>
   {% else %}
