@@ -15,4 +15,4 @@ def require_team_membership():
         abort(404)
 
 
-from . import routes  # noqa: E402,F401
+from . import budgets, routes  # noqa: E402,F401
